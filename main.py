@@ -49,22 +49,36 @@ def main_menu():
     exit_y = 525
     # Переменные для анимации
     current_frame = 1
-    frame_rate = 10  # Количество кадров в секунду
+    frame_rate = 30  # Количество кадров в секунду
     clock = pygame.time.Clock()
     current_screen = "menu"
+    animations = True
+    language = "rus"
     # Загружаем изображение
     image = load_image("image/menu_image.png")
-    bg_settings = load_image("image/settings/background_settings.png")
-    buttons_settings = load_image("image/settings/buttons_settings.png")
+    buttons_settings = [load_image("image/settings/background_settings.png"),
+                        load_image("image/settings/buttons_settings.png"),
+                        load_image("image/settings/language_eng.png"),
+                        load_image("image/settings/language_rus.png"),
+                        load_image("image/settings/left_cross_language.png"),
+                        load_image("image/settings/left_cross_animation.png"),
+                        load_image("image/settings/right_cross_language.png"),
+                        load_image("image/settings/right_cross_animation.png"),
+                        load_image("image/settings/off.png"),
+                        load_image("image/settings/on.png")]
+
+    scrollbar_sound = HorizontalScrollBar(120, 85, 399, 20, 0, 100, 50, WHITE, (86, 153, 128))  # true_width 410, третий аргумент
+    scrollbar_music = HorizontalScrollBar(120, 174, 399, 20, 0, 100, 50, WHITE, (86, 153, 128))  # true_width 410, третий аргумент
+
     # Потом переделать для вызовов ошибок
     if image:
         image_rect = image.get_rect(topleft=(zone_x, zone_y))
-    if bg_settings:
-        bg_settings_rect = bg_settings.get_rect(topleft=(zone_x, zone_y))
     if buttons_settings:
-        buttons_settings_rect = buttons_settings.get_rect(topleft=(zone_x, zone_y))
+        buttons_settings_rect = []
+        for button in buttons_settings:
+            buttons_settings_rect.append(button.get_rect(topleft=(zone_x, zone_y)))
     while True:
-        # # Отрисовка кнопок
+        # Отрисовка кнопок
         # draw_rounded_button(screen, GREEN, button_x, play_y, button_width, button_height, button_radius, "Играть", BLACK)
         # draw_rounded_button(screen, BLUE, button_x, about_y, button_width, button_height, button_radius, "Об игре", BLACK)
         # draw_rounded_button(screen, BLUE, button_x, info_y, button_width, button_height, button_radius, "Инфа", BLACK)
@@ -76,11 +90,18 @@ def main_menu():
                 screen.blit(image, image_rect)
         if current_screen == "settings":
             screen.fill(BLACK)
-            if bg_settings and buttons_settings:
-                screen.blit(bg_settings, bg_settings_rect)
-                screen.blit(buttons_settings, buttons_settings_rect)
-            scrollbar = HorizontalScrollBar(120, 85, 410, 20, 0, 100, 50, WHITE, (86, 153, 128))
-            scrollbar.draw(screen)
+            if buttons_settings:
+                screen.blit(buttons_settings[0], buttons_settings_rect[0])
+                screen.blit(buttons_settings[1], buttons_settings_rect[1])
+                screen.blit(buttons_settings[3], buttons_settings_rect[3])
+                screen.blit(buttons_settings[4], buttons_settings_rect[4])
+                screen.blit(buttons_settings[5], buttons_settings_rect[5])
+                screen.blit(buttons_settings[6], buttons_settings_rect[6])
+                screen.blit(buttons_settings[7], buttons_settings_rect[7])
+                screen.blit(buttons_settings[9], buttons_settings_rect[9])
+            scrollbar_sound.draw(screen)
+            scrollbar_music.draw(screen)
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
@@ -89,10 +110,9 @@ def main_menu():
                     # Получение позиции мыши и состояния кнопок
                     mouse_pos = pygame.mouse.get_pos()
                     mouse_pressed = pygame.mouse.get_pressed()
-                    scrollbar.draw(screen)
                     # Обновление ScrollBar
-                    scrollbar.update(mouse_pos, mouse_pressed)
-                    print(mouse_pos, mouse_pressed)
+                    scrollbar_sound.update(mouse_pos, mouse_pressed)
+                    scrollbar_music.update(mouse_pos, mouse_pressed)
                     # Проверка нажатия на кнопки
                     if create_circle_zone(circle_center_x, circle_center_y, circle_radius, mouse_pos[0], mouse_pos[1]) and current_screen == "settings":
                         fade_transition(screen, BLACK, 750)  # Плавное затемнение
@@ -113,6 +133,7 @@ def main_menu():
                     transition_with_animation(screen)  # Проигрываем анимацию
                     fade_transition(screen, BLACK, 750)  # Плавное затемнение
                     current_screen = "settings" if current_screen == "menu" else "menu"
+                # elif в зоне стрелки то switch_language
                 elif exit_x <= mouse_pos[0] <= exit_x + button_width:
                     if exit_y <= mouse_pos[1] <= exit_y + button_height:
                         pygame.quit()
