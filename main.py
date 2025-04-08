@@ -3,7 +3,7 @@ import sys
 
 from classes.scrollbar import HorizontalScrollBar
 from func.click_zones import create_circle_zone
-from func.transitions import fade_transition, transition_with_animation
+from func.transitions import fade_transition, transition_with_animation,transition_with_animation_out
 from func.image_loader import load_image
 from func.animations import play_animation
 
@@ -49,13 +49,14 @@ def main_menu():
     exit_y = 525
     # Переменные для анимации
     current_frame = 1
-    frame_rate = 30  # Количество кадров в секунду
+    frame_rate = 10  # Количество кадров в секунду
     clock = pygame.time.Clock()
     current_screen = "menu"
     animations = True
     language = "rus"
     # Загружаем изображение
-    image = load_image("image/menu_image.png")
+    image = load_image("image/menu.png")
+    image_bar = pygame.image.load("image/menu_bar.png")
     buttons_settings = [load_image("image/settings/background_settings.png"),
                         load_image("image/settings/buttons_settings.png"),
                         load_image("image/settings/language_eng.png"),
@@ -84,12 +85,13 @@ def main_menu():
         # draw_rounded_button(screen, BLUE, button_x, info_y, button_width, button_height, button_radius, "Инфа", BLACK)
         # draw_rounded_button(screen, RED, button_x, exit_y, button_width, button_height, button_radius, "Выход", BLACK)
         if current_screen == "menu":
-            play_animation(screen, current_frame)
+
             current_frame = (current_frame + 1) % 14
-            if image:
-                screen.blit(image, image_rect)
+            screen.blit(image, image_rect)
+            play_animation(screen, current_frame,zone_x, zone_y)
+            screen.blit(image_bar, image_rect)
         if current_screen == "settings":
-            screen.fill(BLACK)
+            #screen.fill(BLACK)
             if buttons_settings:
                 screen.blit(buttons_settings[0], buttons_settings_rect[0])
                 screen.blit(buttons_settings[1], buttons_settings_rect[1])
@@ -115,8 +117,7 @@ def main_menu():
                     scrollbar_music.update(mouse_pos, mouse_pressed)
                     # Проверка нажатия на кнопки
                     if create_circle_zone(circle_center_x, circle_center_y, circle_radius, mouse_pos[0], mouse_pos[1]) and current_screen == "settings":
-                        fade_transition(screen, BLACK, 750)  # Плавное затемнение
-                        transition_with_animation(screen)  # Проигрываем анимацию
+                        transition_with_animation_out(screen)  # Проигрываем анимацию
                         fade_transition(screen, YELLOW, 750)  # Плавное затемнение
                         current_screen = "menu" if current_screen == "settings" else "settings"
         # Обработка событий
@@ -131,7 +132,6 @@ def main_menu():
                 if create_circle_zone(circle_center_x, circle_center_y, circle_radius, mouse_pos[0], mouse_pos[1]) and current_screen == "menu":
                     fade_transition(screen, BLACK, 750)  # Плавное затемнение
                     transition_with_animation(screen)  # Проигрываем анимацию
-                    fade_transition(screen, BLACK, 750)  # Плавное затемнение
                     current_screen = "settings" if current_screen == "menu" else "menu"
                 # elif в зоне стрелки то switch_language
                 elif exit_x <= mouse_pos[0] <= exit_x + button_width:
